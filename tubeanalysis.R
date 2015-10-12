@@ -1,4 +1,4 @@
-#Youtube Riper
+#Youtube Reaper
 
 library(bitops)
 library(RCurl)
@@ -36,3 +36,5 @@ datas = data.frame(song,artist,ylink, date_posted, total_views, dislikes, likes,
 stats = rbind(stats, datas)
 }
 
+
+write.table(stats, file = "data.csv", col.names = if(file.exists("data.csv"))FALSE else  TRUE, row.names = FALSE, append = TRUE, sep = ",")

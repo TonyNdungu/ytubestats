@@ -8,9 +8,12 @@ License     : Apache License, Version 2.0
 
 Description : Reap stats from a YouTube video
 '
+#get authentication
+source('settings.R')
 
 #load required libraries
 source('packages.R')
+
 loader()
 
 track_song <-function(url_resource)
@@ -24,8 +27,6 @@ track_song <-function(url_resource)
 #   stats: a data frame with data posted,total views,dislikes, likes & timestamp
 # ===============================================================================
 {
-  #get authentication
-  source('settings.R')
   
   #get resource on provided URL
   html <- getURL(url_resource, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))

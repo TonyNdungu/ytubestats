@@ -11,6 +11,7 @@ Description : Reap stats from a YouTube video
 
 #load required libraries
 source('packages.R')
+source('settings.R')
 loader()
 
 track_song <-function(url_resource)

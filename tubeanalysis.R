@@ -1,11 +1,28 @@
-#Youtube Reaper
 
-library(bitops)
-library(RCurl)
-library(XML)
-library(stringr)
+'
+Script      : Youtube Reaper
+Created     : April, 2016
+Author(s)   : Elvis Bando, Chris Orwa
+Version     : v1.5
+License     : Apache License, Version 2.0
+
+Description : Reap stats from a YouTube video
+'
+
+#load required libraries
+source('packages.R')
+loader()
 
 track_song <-function(url_resource)
+# =============================================================================
+#     Capture stastics of a YouTube video
+#
+# Args:
+#   url: a string holds Youtube video URL
+#
+# Returns:
+#   stats: a data frame with data posted,total views,dislikes, likes & timestamp
+# ===============================================================================
 {
   #get resource on provided URL
   html <- getURL(url_resource, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))

@@ -1,40 +1,68 @@
-#Youtube Reaper
 
-library(bitops)
-library(RCurl)
-library(XML)
-library(stringr)
+'
+Script      : Youtube Reaper
+Created     : April, 2016
+Author(s)   : Elvis Bando, Chris Orwa
+Version     : v1.5
+License     : Apache License, Version 2.0
 
-#load the file containig the list of songs you want to track
-wimbo = read.csv(file.choose())
-songs = wimbo$Youtubelink
+Description : Reap stats from a YouTube video
+'
+#get authentication
+source('settings.R')
 
-stats = data.frame()
+#load required libraries
+source('packages.R')
 
-#for each of the songs in your list of songs to track, get how many views.
-#You will need to have downloaded certificate file from 
-#download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
+loader()
 
-for (i in 1:length(songs)){
-  html <- getURL(songs[i], cainfo="cacert.pem")
+track_song <-function(url_resource)
+# ==============================================================================
+#     Capture stastics of a YouTube video
+#
+# Args:
+#   url: a string holds Youtube video URL
+#
+# Returns:
+#   stats: a data frame with data posted,total views,dislikes, likes & timestamp
+# ===============================================================================
+{
+  
+  #get resource on provided URL
+  html <- getURL(url_resource, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+  
+  #convert response to text
   doc = htmlParse(html, asText=TRUE)
+  
+  #extract views on video
   views=xpathSApply (doc,'//*[@class="watch-view-count"]',xmlValue)
+  
+  #extract videos
   dateposted =xpathSApply (doc,'//*[@class="watch-time-text"]',xmlValue)
+  
+  #extract views
   total_views = gsub(",", "", views)
+  
+  #extra date posted
   dateposted = gsub("Published on ", "", dateposted)
   date_posted = as.character(as.Date(dateposted, "%b %d, %Y"))
+  
+  #extract dislikes
   dislikes = xpathSApply (doc,'//*[@class="yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon no-icon-markup like-button-renderer-dislike-button like-button-renderer-dislike-button-unclicked yt-uix-clickcard-target   yt-uix-tooltip"]',xmlValue)
   dislikes = gsub(",", "", dislikes)
+  
+  #extract likes
   likes = xpathSApply (doc,'//*[@class="yt-uix-button yt-uix-button-size-default yt-uix-button-opacity yt-uix-button-has-icon no-icon-markup like-button-renderer-like-button like-button-renderer-like-button-unclicked yt-uix-clickcard-target   yt-uix-tooltip"]',xmlValue)
   likes = gsub(",", "", likes)  
-  song = str_trim(as.character(wimbo[i,1]))
-  artist = str_trim(as.character(wimbo[i,2]))
-  ylink = str_trim(as.character(wimbo[i,3]))
+  
+  #put timestamp
   timestamp = as.numeric(as.POSIXct(Sys.time()))
-
-datas = data.frame(song,artist,ylink, date_posted, total_views, dislikes, likes, timestamp)
-stats = rbind(stats, datas)
+  
+  #combine all fields
+  datas = data.frame(date_posted, total_views, dislikes, likes, timestamp)
+  
+  return(datas)
 }
 
 
-write.table(stats, file = "data.csv", col.names = if(file.exists("data.csv"))FALSE else  TRUE, row.names = FALSE, append = TRUE, sep = ",")
+
